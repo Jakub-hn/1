@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+{% block title %}Admin-Dashboard – TerminPlaner{% endblock %}
+{% block content %}
+
+<div class="stats">
+  <div class="stat-card today">
+    <div class="number">{{ today_count }}</div>
+    <div class="label">Heute</div>
+  </div>
+  <div class="stat-card pending">
+    <div class="number">{{ count_map.get('pending', 0) }}</div>
+    <div class="label">Ausstehend</div>
+  </div>
+  <div class="stat-card confirmed">
+    <div class="number">{{ count_map.get('confirmed', 0) }}</div>
+    <div class="label">Bestätigt</div>
+  </div>
+  <div class="stat-card cancelled">
+    <div class="number">{{ count_map.get('cancelled', 0) }}</div>
+    <div class="label">Abgesagt</div>
+  </div>
+</div>
+
+<div class="page-header">
+  <h1>Alle Termine</h1>
+  <a href="{{ url_for('admin_create') }}" class="btn btn-primary">+ Neuen Termin erstellen</a>
+</div>
+
+<div class="filter-tabs">
+  <a href="{{ url_for('admin_dashboard', status='all') }}"
+     class="filter-tab {% if status_filter == 'all' %}active{% endif %}">Alle</a>
+  <a href="{{ url_for('admin_dashboard', status='pending') }}"
+     class="filter-tab {% if status_filter == 'pending' %}active{% endif %}">Ausstehend</a>
+  <a href="{{ url_for('admin_dashboard', status='confirmed') }}"
+     class="filter-tab {% if status_filter == 'confirmed' %}active{% endif %}">Bestätigt</a>
+  <a href="{{ url_for('admin_dashboard', status='cancelled') }}"
+     class="filter-tab {% if status_filter == 'cancelled' %}active{% endif %}">Abgesagt</a>
+</div>
+
+{% if appointments %}
+  <div class="appt-list">
+    {% for a in appointments %}
+      {% set parts = a['date'].split('-') %}
+      <div class="appt-card {{ a['status'] }}">
+        <div class="appt-date-block">
+          <div class="weekday">{{ a['date'] | weekday }}</div>
+          <div class="day">{{ parts[2] }}</div>
+          <div class="month">
+            {% set months = ['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'] %}
+            {{ months[parts[1]|int - 1] }} {{ parts[0] }}
+          </div>
+        </div>
+
+        <div class="appt-info">
+          <div class="title">{{ a['title'] }}</div>
+          <div class="client-name">&#x1F464; {{ a['client_name'] }} &lt;{{ a['client_email'] }}&gt;</div>
+          <div class="appt-meta">
+            <span>&#x1F550; {{ a['time'] }} Uhr</span>
+            <span>&#x23F1; {{ a['duration'] }} Min.</span>
+            <span><span class="badge badge-{{ a['status'] }}">
+              {% if a['status'] == 'pending' %}Ausstehend
+              {% elif a['status'] == 'confirmed' %}Bestätigt
+              {% else %}Abgesagt{% endif %}
+            </span></span>
+          </div>
+          {% if a['notes'] %}
+            <div class="appt-meta" style="margin-top:.3rem;color:#546e7a;">
+              &#x1F4DD; {{ a['notes'] }}
+            </div>
+          {% endif %}
+        </div>
+
+        <div class="appt-actions">
+          {% if a['status'] == 'pending' %}
+            <form method="POST" action="{{ url_for('admin_confirm', appt_id=a['id']) }}">
+              <button class="btn btn-success btn-sm">Bestätigen</button>
+            </form>
+            <form method="POST" action="{{ url_for('admin_cancel', appt_id=a['id']) }}">
+              <button class="btn btn-warning btn-sm">Absagen</button>
+            </form>
+          {% elif a['status'] == 'confirmed' %}
+            <form method="POST" action="{{ url_for('admin_cancel', appt_id=a['id']) }}"
+                  onsubmit="return confirm('Termin wirklich absagen?')">
+              <button class="btn btn-warning btn-sm">Absagen</button>
+            </form>
+          {% endif %}
+          <form method="POST" action="{{ url_for('admin_delete', appt_id=a['id']) }}"
+                onsubmit="return confirm('Termin endgültig löschen?')">
+            <button class="btn btn-danger btn-sm">Löschen</button>
+          </form>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="empty-state">
+    <div class="icon">&#x1F4C5;</div>
+    <p>Keine Termine gefunden.</p>
+  </div>
+{% endif %}
+{% endblock %}

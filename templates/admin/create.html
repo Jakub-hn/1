@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% block title %}Termin erstellen – TerminPlaner{% endblock %}
+{% block content %}
+
+<div class="form-card">
+  <h2>Neuen Termin erstellen</h2>
+
+  <form method="POST">
+    <div class="form-group">
+      <label for="client_id">Klient</label>
+      <select id="client_id" name="client_id" required>
+        <option value="">-- Klient auswählen --</option>
+        {% for c in clients %}
+          <option value="{{ c['id'] }}">{{ c['name'] }} ({{ c['email'] }})</option>
+        {% endfor %}
+      </select>
+      {% if not clients %}
+        <p class="form-hint">Noch keine Klienten registriert.</p>
+      {% endif %}
+    </div>
+
+    <div class="form-group">
+      <label for="title">Titel / Grund</label>
+      <input type="text" id="title" name="title" required placeholder="z.B. Erstgespräch, Folgetermin …">
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="date">Datum</label>
+        <input type="date" id="date" name="date" required>
+      </div>
+      <div class="form-group">
+        <label for="time">Uhrzeit</label>
+        <input type="time" id="time" name="time" required>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="duration">Dauer</label>
+      <select id="duration" name="duration">
+        <option value="30">30 Minuten</option>
+        <option value="45">45 Minuten</option>
+        <option value="60" selected>60 Minuten</option>
+        <option value="90">90 Minuten</option>
+        <option value="120">120 Minuten</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="notes">Notizen (optional)</label>
+      <textarea id="notes" name="notes" placeholder="Interne Notizen zum Termin …"></textarea>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">Termin erstellen</button>
+      <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary">Abbrechen</a>
+    </div>
+  </form>
+</div>
+
+<script>
+  // Set min date to today
+  document.getElementById('date').min = new Date().toISOString().split('T')[0];
+</script>
+{% endblock %}

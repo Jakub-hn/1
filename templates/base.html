@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Terminverwaltung{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <nav>
+    <a href="{{ url_for('index') }}" class="brand">Termin<span>Planer</span></a>
+    <div class="nav-links">
+      {% if session.user_id %}
+        <span class="nav-user">{{ session.user_name }}</span>
+        {% if session.role == 'admin' %}
+          <a href="{{ url_for('admin_dashboard') }}">Dashboard</a>
+          <a href="{{ url_for('admin_create') }}">+ Termin</a>
+        {% else %}
+          <a href="{{ url_for('client_dashboard') }}">Meine Termine</a>
+          <a href="{{ url_for('client_book') }}">+ Anfragen</a>
+        {% endif %}
+        <a href="{{ url_for('logout') }}">Abmelden</a>
+      {% else %}
+        <a href="{{ url_for('login') }}">Anmelden</a>
+        <a href="{{ url_for('register') }}">Registrieren</a>
+      {% endif %}
+    </div>
+  </nav>
+
+  <div class="container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, message in messages %}
+        <div class="alert alert-{{ category }}">{{ message }}</div>
+      {% endfor %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+  </div>
+</body>
+</html>

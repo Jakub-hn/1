@@ -1,0 +1,122 @@
+{% extends 'base.html' %}
+{% block title %}Meine Termine – TerminPlaner{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <h1>Meine Termine</h1>
+  <a href="{{ url_for('client_book') }}" class="btn btn-primary">+ Termin anfragen</a>
+</div>
+
+{% set upcoming_confirmed = upcoming | selectattr('status', 'equalto', 'confirmed') | list %}
+{% set upcoming_pending   = upcoming | selectattr('status', 'equalto', 'pending')   | list %}
+
+{% if upcoming_confirmed %}
+  <div class="section-title">Bestätigte Termine</div>
+  <div class="appt-list">
+    {% for a in upcoming_confirmed %}
+      {% set parts = a['date'].split('-') %}
+      {% set months = ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'] %}
+      <div class="appt-card confirmed">
+        <div class="appt-date-block">
+          <div class="weekday">{{ a['date'] | weekday }}</div>
+          <div class="day">{{ parts[2] }}</div>
+          <div class="month">{{ months[parts[1]|int - 1][:3] }} {{ parts[0] }}</div>
+        </div>
+        <div class="appt-info">
+          <div class="title">{{ a['title'] }}</div>
+          <div class="appt-meta">
+            <span>&#x1F550; {{ a['time'] }} Uhr</span>
+            <span>&#x23F1; {{ a['duration'] }} Min.</span>
+            <span><span class="badge badge-confirmed">Bestätigt</span></span>
+          </div>
+          {% if a['notes'] %}
+            <div class="appt-meta" style="margin-top:.3rem;color:#546e7a;">
+              &#x1F4DD; {{ a['notes'] }}
+            </div>
+          {% endif %}
+        </div>
+        <div class="appt-actions">
+          <form method="POST" action="{{ url_for('client_cancel', appt_id=a['id']) }}"
+                onsubmit="return confirm('Termin wirklich absagen?')">
+            <button class="btn btn-warning btn-sm">Absagen</button>
+          </form>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
+
+{% if upcoming_pending %}
+  <div class="section-title">Ausstehende Anfragen</div>
+  <div class="appt-list">
+    {% for a in upcoming_pending %}
+      {% set parts = a['date'].split('-') %}
+      {% set months = ['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'] %}
+      <div class="appt-card pending">
+        <div class="appt-date-block">
+          <div class="weekday">{{ a['date'] | weekday }}</div>
+          <div class="day">{{ parts[2] }}</div>
+          <div class="month">{{ months[parts[1]|int - 1] }} {{ parts[0] }}</div>
+        </div>
+        <div class="appt-info">
+          <div class="title">{{ a['title'] }}</div>
+          <div class="appt-meta">
+            <span>&#x1F550; {{ a['time'] }} Uhr</span>
+            <span>&#x23F1; {{ a['duration'] }} Min.</span>
+            <span><span class="badge badge-pending">Ausstehend</span></span>
+          </div>
+          {% if a['notes'] %}
+            <div class="appt-meta" style="margin-top:.3rem;color:#546e7a;">
+              &#x1F4DD; {{ a['notes'] }}
+            </div>
+          {% endif %}
+        </div>
+        <div class="appt-actions">
+          <form method="POST" action="{{ url_for('client_cancel', appt_id=a['id']) }}"
+                onsubmit="return confirm('Anfrage wirklich zurückziehen?')">
+            <button class="btn btn-warning btn-sm">Zurückziehen</button>
+          </form>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
+
+{% if not upcoming_confirmed and not upcoming_pending %}
+  <div class="empty-state">
+    <div class="icon">&#x1F4C5;</div>
+    <p>Sie haben noch keine bevorstehenden Termine.<br>
+    <a href="{{ url_for('client_book') }}">Jetzt einen Termin anfragen</a></p>
+  </div>
+{% endif %}
+
+{% if cancelled %}
+  <details style="margin-top:2rem;">
+    <summary style="cursor:pointer;color:#90a4ae;font-size:.9rem;padding:.5rem 0;">
+      Abgesagte Termine anzeigen ({{ cancelled | length }})
+    </summary>
+    <div class="appt-list" style="margin-top:.8rem;">
+      {% for a in cancelled %}
+        {% set parts = a['date'].split('-') %}
+        {% set months = ['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'] %}
+        <div class="appt-card cancelled">
+          <div class="appt-date-block">
+            <div class="weekday">{{ a['date'] | weekday }}</div>
+            <div class="day">{{ parts[2] }}</div>
+            <div class="month">{{ months[parts[1]|int - 1] }} {{ parts[0] }}</div>
+          </div>
+          <div class="appt-info">
+            <div class="title">{{ a['title'] }}</div>
+            <div class="appt-meta">
+              <span>&#x1F550; {{ a['time'] }} Uhr</span>
+              <span><span class="badge badge-cancelled">Abgesagt</span></span>
+            </div>
+          </div>
+          <div class="appt-actions"></div>
+        </div>
+      {% endfor %}
+    </div>
+  </details>
+{% endif %}
+
+{% endblock %}

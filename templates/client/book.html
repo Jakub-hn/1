@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block title %}Termin anfragen – TerminPlaner{% endblock %}
+{% block content %}
+
+<div class="form-card">
+  <h2>Termin anfragen</h2>
+  <p style="font-size:.88rem;color:#6c757d;margin-bottom:1.4rem;">
+    Füllen Sie das Formular aus. Wir bestätigen Ihren Wunschtermin so bald wie möglich.
+  </p>
+
+  <form method="POST">
+    <div class="form-group">
+      <label for="title">Grund / Betreff</label>
+      <input type="text" id="title" name="title" required placeholder="z.B. Erstgespräch, Folgetermin, Beratung …">
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="date">Wunschdatum</label>
+        <input type="date" id="date" name="date" required>
+      </div>
+      <div class="form-group">
+        <label for="time">Wunschuhrzeit</label>
+        <input type="time" id="time" name="time" required>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="duration">Gewünschte Dauer</label>
+      <select id="duration" name="duration">
+        <option value="30">30 Minuten</option>
+        <option value="45">45 Minuten</option>
+        <option value="60" selected>60 Minuten</option>
+        <option value="90">90 Minuten</option>
+        <option value="120">120 Minuten</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="notes">Nachricht (optional)</label>
+      <textarea id="notes" name="notes" placeholder="Gibt es etwas, das wir im Voraus wissen sollten?"></textarea>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">Anfrage senden</button>
+      <a href="{{ url_for('client_dashboard') }}" class="btn btn-secondary">Abbrechen</a>
+    </div>
+  </form>
+</div>
+
+<script>
+  document.getElementById('date').min = new Date().toISOString().split('T')[0];
+</script>
+{% endblock %}

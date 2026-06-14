@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registrieren – TerminPlaner</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="auth-wrapper">
+    <div class="auth-box">
+      <div class="auth-logo">
+        <h1>TerminPlaner</h1>
+        <p>Neues Klient-Konto erstellen</p>
+      </div>
+
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }}">{{ message }}</div>
+        {% endfor %}
+      {% endwith %}
+
+      <form method="POST">
+        <div class="form-group">
+          <label for="name">Vollständiger Name</label>
+          <input type="text" id="name" name="name" required placeholder="Max Mustermann">
+        </div>
+        <div class="form-group">
+          <label for="email">E-Mail-Adresse</label>
+          <input type="email" id="email" name="email" required autocomplete="email" placeholder="name@beispiel.de">
+        </div>
+        <div class="form-group">
+          <label for="password">Passwort</label>
+          <input type="password" id="password" name="password" required placeholder="Min. 6 Zeichen">
+        </div>
+        <div class="form-group">
+          <label for="confirm_password">Passwort bestätigen</label>
+          <input type="password" id="confirm_password" name="confirm_password" required placeholder="Passwort wiederholen">
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary" style="flex:1">Konto erstellen</button>
+        </div>
+      </form>
+
+      <div class="auth-link">
+        Bereits registriert? <a href="{{ url_for('login') }}">Anmelden</a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
